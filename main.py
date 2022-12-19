@@ -52,7 +52,7 @@ if __name__ == '__main__':
                       rf.random_field.reshape(11, 11)[7, :]])
 
     crf = ConditionalRandomFields(ModelName.Gaussian, KrigingMethod.Ordinary,
-                                  theta=[1, 3], anisotropy=[1, 1], angles=[np.pi/6])
+                                  [1, 3], [1, 1], [np.pi/6])
     crf.generate([X, Y], 20, 2, coordinates, data)
 
     # make plot
