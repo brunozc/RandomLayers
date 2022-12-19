@@ -3,8 +3,6 @@ import gstools as gs
 import numpy as np
 
 
-MODEL_NAME = ["Gaussian", "Exponential", "Matern", "Linear"]
-
 class BaseClass:
     """ Base class for Random Fields """
     def __init__(self, model_name: str, theta: float, anisotropy: list, angles: list, seed: int) -> None:
@@ -41,8 +39,6 @@ class BaseClass:
         self.random_field = None
         self.random_field_model = None
         # model name
-        if model_name not in MODEL_NAME:
-            sys.exit(f"ERROR: model_name needs to be: {', '.join(MODEL_NAME)}")
         self.model_name = model_name
 
     def define_model(self, mean: float, variance: float):
@@ -58,18 +54,18 @@ class BaseClass:
         """
 
         # initialise model
-        if self.model_name == 'Gaussian':
+        if self.model_name.value == 'Gaussian':
             model = gs.Gaussian(dim=self.n_dim, var=variance,
                                 len_scale=self.len_scale, angles=self.angles)
-        elif self.model_name == 'Exponential':
+        elif self.model_name.value == 'Exponential':
             model = gs.Exponential(
                 dim=self.n_dim, var=variance, len_scale=self.len_scale, angles=self.angles)
-        elif self.model_name == 'Matern':
+        elif self.model_name.value == 'Matern':
             model = gs.Matern(dim=self.n_dim, var=variance, len_scale=self.len_scale, angles=self.angles)
-        elif self.model_name == 'Linear':
+        elif self.model_name.value == 'Linear':
             model = gs.Linear(dim=self.n_dim, var=variance, len_scale=self.len_scale, angles=self.angles)
         else:
-            sys.exit(f'ERROR: model name: {self.model_name} is not supported')
+            sys.exit(f'ERROR: model name: {self.model_name.value} is not supported')
 
         self.random_field_model = model
 

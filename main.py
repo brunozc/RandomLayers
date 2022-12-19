@@ -4,6 +4,7 @@ import matplotlib as mpl
 
 # RandomLayers package
 from RandomLayers.random_fields import RandomFields, ConditionalRandomFields
+from RandomLayers.methods import ModelName
 
 
 if __name__ == '__main__':
@@ -12,12 +13,12 @@ if __name__ == '__main__':
     y = np.linspace(0, 10, 11)
     X, Y = np.meshgrid(x, y, indexing="ij")
 
-    rf = RandomFields("Gaussian", theta=[1, 3], anisotropy=[1, 1], angles=[np.pi/6])
+    rf = RandomFields(ModelName.Gaussian, theta=[1, 3], anisotropy=[1, 1], angles=[np.pi/6])
     rf.generate([X, Y], 20, 2)
 
     # non regular grid
     X, Y = np.meshgrid(x, y, indexing="ij") + np.random.random((11, 11)) * 0.1
-    rf2 = RandomFields("Gaussian", theta=[1, 3], anisotropy=[1, 1], angles=[np.pi/6])
+    rf2 = RandomFields(ModelName.Gaussian, theta=[1, 3], anisotropy=[1, 1], angles=[np.pi/6])
     rf2.generate([X, Y], 20, 2)
 
     # make plot
@@ -46,11 +47,11 @@ if __name__ == '__main__':
         coordinates[i * 11: (i + 1) * 11, 0] = Xi
         coordinates[i * 11: (i + 1) * 11, 1] = Yi
 
-    # colect basic rf at this points
+    # collect basic rf at this points
     data = np.vstack([rf.random_field.reshape(11, 11)[3, :],
                       rf.random_field.reshape(11, 11)[7, :]])
 
-    crf = ConditionalRandomFields("Gaussian", theta=[1, 3], anisotropy=[1, 1], angles=[np.pi/6])
+    crf = ConditionalRandomFields(ModelName.Gaussian, theta=[1, 3], anisotropy=[1, 1], angles=[np.pi/6])
     crf.generate([X, Y], 20, 2, coordinates, data)
 
     # make plot
