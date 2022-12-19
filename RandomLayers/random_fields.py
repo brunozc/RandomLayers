@@ -78,6 +78,19 @@ class RandomFields(BaseClass):
     def __init__(self, model_name: str, theta: float, anisotropy: list, angles: list, seed: int = 14) -> None:
         """
         Initialise generation of random fields
+
+        Parameters:
+        -----------
+        model_name: str
+            Name of the model to be used. Options are: "Gaussian", "Exponential", "Matern", "Linear"
+        theta: float
+            The scale of the fluctuation
+        anisotropy: list
+            The anisotropy of the model
+        angles: list
+            The angles of the model
+        seed: int
+            The seed number for the random number generator
         """
         super().__init__(model_name, theta, anisotropy, angles, seed)
 
@@ -115,11 +128,28 @@ class ConditionalRandomFields(BaseClass):
     Generate conditional random fields
     """
 
-    def __init__(self, model_name: str, theta: float, anisotropy: list, angles: list, seed: int = 14) -> None:
+    def __init__(self, model_name: str, kriging_model: str, theta: float, anisotropy: list, angles: list, seed: int = 14) -> None:
         """
         Initialise generation of random fields
+
+        Parameters:
+        -----------
+        model_name: str
+            Name of the model to be used. Options are: "Gaussian", "Exponential", "Matern", "Linear"
+        kriging_model: str
+            Name of the kriging model to be used. Options are: "Ordinary", "Universal", "Simple"
+        theta: float
+            The scale of the fluctuation
+        anisotropy: list
+            The anisotropy of the model
+        angles: list
+            The angles of the model
+        seed: int
+            The seed number for the random number generator
         """
         super().__init__(model_name, theta, anisotropy, angles, seed)
+        self.kriging = kriging_model
+
 
     def generate(self, nodes: list, mean: float, variance: float, coordinates: list, data: list) -> None:
         """
@@ -147,7 +177,13 @@ class ConditionalRandomFields(BaseClass):
         self.define_model(mean, variance)
 
         # create conditional random field
-        krige = gs.krige.Ordinary(self.random_field_model, coordinates, data)
+        if self.kriging.value == 'Ordinary':
+            krige = gs.krige.Ordinary(self.random_field_model, coordinates, data)
+        elif self.kriging.value == 'Simple':
+            krige = gs.krige.Simple(self.random_field_model, coordinates, data)
+        else:
+            sys.exit(f'ERROR: kriging model name: {self.kriging.value} is not supported')
+
         cond_srf = gs.CondSRF(krige)
         cond_srf.set_pos(nodes)
 

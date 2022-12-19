@@ -8,7 +8,6 @@ class ModelName(Enum):
     Linear = "Linear"
 
 
-class Krigging(Enum):
+class KrigingMethod(Enum):
     Ordinary = "Ordinary"
-    Universal = "Universal"
     Simple = "Simple"
