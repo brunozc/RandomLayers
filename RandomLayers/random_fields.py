@@ -5,7 +5,7 @@ import numpy as np
 
 class BaseClass:
     """ Base class for Random Fields """
-    def __init__(self, model_name: str, theta: float, anisotropy: list, angles: list, seed: int) -> None:
+    def __init__(self, model_name: str, polygons, theta: list, anisotropy: list, angles: list, seed: int) -> None:
         """
         Initialise random fields
 
@@ -13,7 +13,9 @@ class BaseClass:
         -----------
         model_name: str
             Name of the model to be used. Options are: "Gaussian", "Exponential", "Matern", "Linear"
-        theta: float
+        polygons: list
+            The polygons of the mesh
+        theta: list
             The scale of the fluctuation
         anisotropy: list
             The anisotropy of the model
@@ -23,27 +25,37 @@ class BaseClass:
             The seed number for the random number generator
         """
         # check dimension
-        if len(anisotropy) != len(angles) + 1:
-            sys.exit(
-                'ERROR: angles dimensions need to be dimensions of anisotropy - 1')
+        if len(anisotropy) != len(angles):
+            sys.exit('ERROR: angles dimensions need to be dimensions of anisotropy.')
 
         # scale of fluctuation
         self.len_scale = np.array(anisotropy) * theta
         # angles
         self.angles = angles
-        # dimensions
-        self.n_dim = len(self.len_scale)
         # seed number
         self.seed = seed
         # random fields
-        self.random_field = None
-        self.random_field_model = None
+        self.random_field = []
+        self.random_field_model = []
         # model name
         self.model_name = model_name
+        # number of polygons
+        self.nb_polygons = len(polygons)
+        # polygons
+        self.polygons = polygons
 
-    def define_model(self, mean: float, variance: float):
+        # check dimensions
+        aux = [i.shape[1] for i in self.polygons]
+        for i in aux:
+            if i != self.polygons[0].shape[1]:
+                sys.exit('ERROR: all polygons need to have the same dimension.')
+        self.n_dim = aux[0]
+
+
+    def define_model(self, mean: list, variance: list):
         """
         Define and check model for the Random Field
+        Creates a model for each polygon
 
         Parameters:
         -----------
@@ -53,21 +65,22 @@ class BaseClass:
             The variance of the model
         """
 
-        # initialise model
-        if self.model_name.value == 'Gaussian':
-            model = gs.Gaussian(dim=self.n_dim, var=variance,
-                                len_scale=self.len_scale, angles=self.angles)
-        elif self.model_name.value == 'Exponential':
-            model = gs.Exponential(
-                dim=self.n_dim, var=variance, len_scale=self.len_scale, angles=self.angles)
-        elif self.model_name.value == 'Matern':
-            model = gs.Matern(dim=self.n_dim, var=variance, len_scale=self.len_scale, angles=self.angles)
-        elif self.model_name.value == 'Linear':
-            model = gs.Linear(dim=self.n_dim, var=variance, len_scale=self.len_scale, angles=self.angles)
-        else:
-            sys.exit(f'ERROR: model name: {self.model_name.value} is not supported')
+        # for each polygon generate RF model
+        for i in range(self.nb_polygons):
+            # initialise model
+            if self.model_name.value == 'Gaussian':
+                model = gs.Gaussian(dim=self.n_dim, var=variance[i], len_scale=self.len_scale[i], angles=self.angles[i])
+            elif self.model_name.value == 'Exponential':
+                model = gs.Exponential(
+                    dim=self.n_dim, var=variance, len_scale=self.len_scale[i], angles=self.angles[i])
+            elif self.model_name.value == 'Matern':
+                model = gs.Matern(dim=self.n_dim, var=variance[i], len_scale=self.len_scale[i], angles=self.angles[i])
+            elif self.model_name.value == 'Linear':
+                model = gs.Linear(dim=self.n_dim, var=variance[i], len_scale=self.len_scale[i], angles=self.angles[i])
+            else:
+                sys.exit(f'ERROR: model name: {self.model_name.value} is not supported')
 
-        self.random_field_model = model
+            self.random_field_model.append(model)
 
 
 class RandomFields(BaseClass):
@@ -75,7 +88,7 @@ class RandomFields(BaseClass):
     Generate random fields
     """
 
-    def __init__(self, model_name: str, theta: float, anisotropy: list, angles: list, seed: int = 14) -> None:
+    def __init__(self, model_name: str, polygons: list, theta: list, anisotropy: list, angles: list, seed: int = 14) -> None:
         """
         Initialise generation of random fields
 
@@ -83,7 +96,9 @@ class RandomFields(BaseClass):
         -----------
         model_name: str
             Name of the model to be used. Options are: "Gaussian", "Exponential", "Matern", "Linear"
-        theta: float
+        polygons: list
+            The polygons for the random field
+        theta: list
             The scale of the fluctuation
         anisotropy: list
             The anisotropy of the model
@@ -92,35 +107,35 @@ class RandomFields(BaseClass):
         seed: int
             The seed number for the random number generator
         """
-        super().__init__(model_name, theta, anisotropy, angles, seed)
+        super().__init__(model_name, polygons, theta, anisotropy, angles, seed)
 
-    def generate(self, nodes: list, mean: float, variance: float) -> None:
+    def generate(self, mean: list, variance: list) -> None:
         """
         Generate random field
 
         Parameters:
         ------------
-        nodes: np.array
-            The nodes of the random field
-        mean: float
-            The mean of the random field
-        variance: float
-            The variance of the random field
+        mean: list
+            The mean of the random field for each polygon
+        variance: list
+            The variance of the random field for each polygon
         """
 
         # check dimensions of nodes
-        if len(nodes) != self.n_dim:
-            sys.exit('ERROR: dimensions of nodes do not match dimensions of model')
+        for nodes in self.polygons:
+            if nodes.shape[1] != self.n_dim:
+                sys.exit('ERROR: dimensions of nodes do not match dimensions of model')
 
         # assign model
         self.define_model(mean, variance)
 
         # create random field
-        self.random_field_model = gs.SRF(self.random_field_model, mean=mean, seed=self.seed)
-        self.random_field_model(nodes)
+        for i, nodes in enumerate(self.polygons):
+            self.random_field_model[i] = gs.SRF(self.random_field_model[i], mean=mean[i], seed=self.seed)
+            self.random_field_model[i](nodes)
 
-        # random field
-        self.random_field = self.random_field_model[0]
+            # random field
+            self.random_field.append(self.random_field_model[i][0])
 
 
 class ConditionalRandomFields(BaseClass):
