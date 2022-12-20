@@ -13,42 +13,42 @@ from RandomLayers.utils import plot3D
 if __name__ == '__main__':
 
     x_max = 10
-    y1 = 2
-    y2 = 5
-    z_max = 20
+    y_max = 20
+    z1 = 5
+    z2 = 7
     plane_0 = np.array([[0, 0, 0],
                         [x_max, 0, 0],
-                        [0, 0, z_max],
-                        [x_max, 0, z_max],
+                        [0, y_max, 0],
+                        [x_max, y_max, 0],
                         ])
 
-    plane_1 = np.array([[0, y1, 0],
-                        [x_max, y1, 0],
-                        [0, y1, z_max],
-                        [x_max, y1, z_max],
+    plane_1 = np.array([[0, 0, z1],
+                        [x_max, 0, z1],
+                        [0, y_max, z1],
+                        [x_max, y_max, z1],
                         ])
 
-    plane_2 = np.array([[0, y2, 0],
-                        [x_max, y2, 0],
-                        [0, y2, z_max],
-                        [x_max, y2, z_max],
+    plane_2 = np.array([[0, 0, z2],
+                        [x_max, 0, z2],
+                        [0, y_max, z2],
+                        [x_max, y_max, z2],
                         ])
 
     # variance for each plane
     plane_cov = [[0, 0, 0],
-                 [0, .2, 0],
+                 [0, 0, 0.15],
                  [0, 0, 0],
                 ]
 
     layers = LayersMesh([plane_0, plane_1, plane_2], plane_cov)
-    x = np.linspace(0, x_max, 11)
-    y = np.linspace(0, y2, 11)
-    z = np.linspace(0, z_max, 11)
+    x = np.linspace(0, x_max, 51)
+    y = np.linspace(0, y_max, 51)
+    z = np.linspace(0, z2, 51)
     X, Y, Z = np.meshgrid(x, y, z, indexing="ij")
     layers.generate_mesh(np.array([X.ravel(), Y.ravel(), Z.ravel()]).T)
 
-    theta = [[1, 3, 1],
-             [1, 5, 1]]
+    theta = [[1, 1, 3],
+             [1, 1, 5]]
 
     anyso = [[1, 1, 1],
              [1, 1, 1]]
