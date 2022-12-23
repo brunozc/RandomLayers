@@ -1,4 +1,3 @@
-import sys
 import gstools as gs
 import numpy as np
 
@@ -26,7 +25,7 @@ class BaseClass:
         """
         # check dimension
         if len(anisotropy) != len(angles):
-            sys.exit('ERROR: angles dimensions need to be dimensions of anisotropy.')
+            raise ValueError('Angles dimensions need to be dimensions of anisotropy.')
 
         # scale of fluctuation
         self.len_scale = np.array(anisotropy) * theta
@@ -48,7 +47,7 @@ class BaseClass:
         aux = [i.shape[1] for i in self.polygons]
         for i in aux:
             if i != self.polygons[0].shape[1]:
-                sys.exit('ERROR: all polygons need to have the same dimension.')
+                raise ValueError('All polygons need to have the same dimension.')
         self.n_dim = aux[0]
 
 
@@ -78,7 +77,7 @@ class BaseClass:
             elif self.model_name.value == 'Linear':
                 model = gs.Linear(dim=self.n_dim, var=variance[i], len_scale=self.len_scale[i], angles=self.angles[i])
             else:
-                sys.exit(f'ERROR: model name: {self.model_name.value} is not supported')
+                raise ValueError(f'Model name: {self.model_name.value} is not supported')
 
             self.random_field_model.append(model)
 
@@ -124,7 +123,7 @@ class RandomFields(BaseClass):
         # check dimensions of nodes
         for nodes in self.polygons:
             if nodes.shape[1] != self.n_dim:
-                sys.exit('ERROR: dimensions of nodes do not match dimensions of model')
+                raise ValueError('Dimensions of nodes do not match dimensions of model')
 
         # assign model
         self.define_model(mean, variance)
@@ -185,7 +184,7 @@ class ConditionalRandomFields(BaseClass):
 
         # check dimensions of nodes
         if len(nodes) != self.n_dim:
-            sys.exit('ERROR: dimensions of nodes do not match dimensions of model')
+            raise ValueError('Dimensions of nodes do not match dimensions of model')
 
         # assign model
         self.define_model(mean, variance)
@@ -196,7 +195,7 @@ class ConditionalRandomFields(BaseClass):
         elif self.kriging.value == 'Simple':
             krige = gs.krige.Simple(self.random_field_model, coordinates, data)
         else:
-            sys.exit(f'ERROR: kriging model name: {self.kriging.value} is not supported')
+            raise ValueError(f'Kriging model name: {self.kriging.value} is not supported')
 
         cond_srf = gs.CondSRF(krige)
         cond_srf.set_pos(nodes)

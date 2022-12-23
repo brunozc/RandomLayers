@@ -8,7 +8,22 @@ import matplotlib as mpl
 
 def plot3D(coordinates: list, random_field: list, title: str = "Random Field",
            output_folder = "./", output_name: str = "random_field.png"):
+    """
+    Plot 3D random field
 
+    Parameters
+    ----------
+    coordinates : list
+        List of coordinates of the random field
+    random_field : list
+        List of random field values
+    title : str
+        Title of the plot
+    output_folder : str
+        Output folder
+    output_name : str
+        Output fine name
+    """
     # create output folder
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
@@ -40,6 +55,22 @@ def plot3D(coordinates: list, random_field: list, title: str = "Random Field",
 
 def plot2D(coordinates: list, random_field: list, title: str = "Random Field",
            output_folder = "./", output_name: str = "random_field.png"):
+    """
+    Plot 2D random field
+
+    Parameters
+    ----------
+    coordinates : list
+        List of coordinates of the random field
+    random_field : list
+        List of random field values
+    title : str
+        Title of the plot
+    output_folder : str
+        Output folder
+    output_name : str
+        Output fine name
+    """
 
     # create output folder
     if not os.path.exists(output_folder):
@@ -69,7 +100,26 @@ def plot2D(coordinates: list, random_field: list, title: str = "Random Field",
 
 def plot3D_viewer(coordinates: list, random_field: list, title: str = "Random Field",
            output_folder="./", output_name: str = "random_field.html", fps: int = 10, format: str = "html"):
+    """
+    Plot a 3D animation of the random field
 
+    Parameters
+    ----------
+    coordinates : list
+        List of coordinates of the random field
+    random_field : list
+        List of random field values
+    title : str
+        Title of the plot
+    output_folder : str
+        Output folder
+    output_name : str
+        Output fine name
+    fps : int
+        Frames per second
+    format : str
+        Format of the animation
+    """
     # create output folder
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
@@ -108,3 +158,41 @@ def plot3D_viewer(coordinates: list, random_field: list, title: str = "Random Fi
 
     # save animation
     im_ani.save(output_name, writer=writer)
+    plt.close()
+
+
+def slice(coordinates: list, random_field: list, axis: int, coord_slice: float):
+    """
+    Slice the random field in a given axis at a given coordinate
+
+    Parameters
+    ----------
+    coordinates : list
+        List of coordinates
+    random_field : list
+        Random field values
+    axis : int
+        Axis to slice
+    coord_slice : float
+        Coordinate to slice
+    """
+
+    # determine unique coordinates along axis
+    c_axis = np.unique([np.unique(coord[:, axis]) for coord in coordinates])
+    if coord_slice not in c_axis:
+        raise ValueError(f"Coordinate to slice {coord_slice} not in the random field coordinates")
+
+    # determine indexes of remaining coordinates
+    indexes = list(range(len(coordinates[0][0])))
+    indexes.pop(axis)
+
+    new_coordinates = np.empty((0, len(indexes)))
+    slice_data = []
+    for i, coord in enumerate(coordinates):
+
+        idx = np.where(coord[:, axis] == coord_slice)
+        aux = [coord[idx, j].ravel() for j in indexes]
+        new_coordinates = np.append(new_coordinates, np.array(aux).T, axis=0)
+        slice_data.extend(random_field[i][idx])
+
+    return new_coordinates, np.array(slice_data)

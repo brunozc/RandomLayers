@@ -1,4 +1,3 @@
-import sys
 import numpy as np
 from scipy.interpolate import interp2d
 from scipy.spatial import Delaunay
@@ -57,7 +56,7 @@ class LayersMesh:
         for pl in planes:
             coords = vectors_operation.project_point_to_plane(pl, pl)
             if vectors_operation.check_orientation(coords) != "anti-clockwise":
-                sys.exit(f'ERROR: Points {pl} are not in counter-clockwise order')
+                raise ValueError(f'Points {pl} are not in counter-clockwise order')
 
         # generate polygons
         self.generate_polygons(model, theta, anisotropy, angles, nb_steps = self.resample_points)
@@ -136,7 +135,7 @@ class LayersMesh:
                     break
 
             if aux is False:
-                sys.exit(f'ERROR: Point {n} not in polygon')
+                raise ValueError(f'Point {n} not in polygon')
 
         index_polygons = list(set(self.polygons_index))
         self.mesh = Mesh()

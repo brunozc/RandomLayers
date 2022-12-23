@@ -4,7 +4,7 @@ import numpy as np
 from RandomLayers.random_fields import RandomFields, ConditionalRandomFields
 from RandomLayers.methods import ModelName, KrigingMethod
 from RandomLayers.mesh import LayersMesh
-from RandomLayers.utils import plot3D, plot3D_viewer
+from RandomLayers.utils import plot3D, plot3D_viewer, slice
 
 
 if __name__ == '__main__':
@@ -76,3 +76,8 @@ if __name__ == '__main__':
 
     plot3D(layers.mesh.polygons_points, rf.random_field, output_folder="./", output_name="RF.png")
     plot3D_viewer(layers.mesh.polygons_points, rf.random_field, output_folder="./", output_name="RF.html")
+    coord, sliced_rf = slice(layers.mesh.polygons_points, rf.random_field, 1, -50)
+
+    # import matplotlib.pylab as plt
+    # plt.scatter(np.array(coord)[:, 0], np.array(coord)[:, 1], c=sliced_rf)
+    # plt.show()
