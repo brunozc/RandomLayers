@@ -72,7 +72,7 @@ class BaseClass:
                 model = gs.Gaussian(dim=self.n_dim, var=variance[i], len_scale=self.len_scale[i], angles=self.angles[i])
             elif self.model_name.value == 'Exponential':
                 model = gs.Exponential(
-                    dim=self.n_dim, var=variance, len_scale=self.len_scale[i], angles=self.angles[i])
+                    dim=self.n_dim, var=variance[i], len_scale=self.len_scale[i], angles=self.angles[i])
             elif self.model_name.value == 'Matern':
                 model = gs.Matern(dim=self.n_dim, var=variance[i], len_scale=self.len_scale[i], angles=self.angles[i])
             elif self.model_name.value == 'Linear':
@@ -132,8 +132,7 @@ class RandomFields(BaseClass):
         # create random field
         for i, nodes in enumerate(self.polygons):
             self.random_field_model[i] = gs.SRF(self.random_field_model[i], mean=mean[i], seed=self.seed)
-            self.random_field_model[i](nodes)
-
+            self.random_field_model[i](nodes.T)
             # random field
             self.random_field.append(self.random_field_model[i][0])
 

@@ -19,12 +19,6 @@ if __name__ == '__main__':
                         [0, y_max, 0],
                         ])
 
-    plane_1 = np.array([[0, 0, z1],
-                        [x_max, 0, z1],
-                        [x_max, y_max, z1],
-                        [0, y_max, z1],
-                        ])
-
     plane_2 = np.array([[0, 0, z2],
                         [x_max, 0, z2],
                         [x_max, y_max, z2],
@@ -33,23 +27,19 @@ if __name__ == '__main__':
 
     # variance for each plane
     plane_cov = [[0, 0, 0],
-                 [0, 0, 0.2],
                  [0, 0, 0],
                 ]
 
-    theta = [[1, 1, 1],
-             [1, 1, 1]]
+    theta = [[1, 1, 1]]
 
-    anyso = [[1, 1, 1],
-             [1, 1, 1]]
+    anyso = [[1, 1, 1]]
 
-    angles = [[0, 0, 0],
-              [0, 0, 0]]
+    angles = [[0, 0, 0]]
 
     resample_points = 51
 
 
-    layers = LayersMesh([plane_0, plane_1, plane_2], plane_cov,
+    layers = LayersMesh([plane_0, plane_2], plane_cov,
                         model=ModelName.Gaussian, theta=theta, anisotropy=anyso, angles=angles, resample_points=10)
 
     x = np.linspace(0, x_max, resample_points)
@@ -61,18 +51,18 @@ if __name__ == '__main__':
 
 
     theta = [[5, 5, 1],
-             [5, 5, 1]]
+             ]
 
     anyso = [[1, 1, 1],
-             [1, 1, 1]]
+             ]
 
-    angles = [[-np.pi/6, 0, 0],
-              [np.pi/6, 0, 0]]
+    angles = [[np.pi/6, 0, 0],
+              ]
 
     var = []
 
     rf = RandomFields(ModelName.Gaussian, layers.mesh.polygons_points, theta, anyso, angles)
-    rf.generate([20, 10], [5, 5])
+    rf.generate([20], [5])
 
-    plot3D(layers.mesh.polygons_points, rf.random_field, output_folder="./", output_name="RF.png")
-    plot3D_viewer(layers.mesh.polygons_points, rf.random_field, output_folder="./", output_name="RF.html")
+    plot3D(layers.mesh.polygons_points, rf.random_field, output_folder="./", output_name="RF_1.png")
+    plot3D_viewer(layers.mesh.polygons_points, rf.random_field, output_folder="./", output_name="RF_1.html")
