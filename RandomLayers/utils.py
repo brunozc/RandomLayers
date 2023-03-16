@@ -125,9 +125,9 @@ def plot3D_viewer(coordinates: list, random_field: list, title: str = "Random Fi
         os.makedirs(output_folder)
 
     # make plot
-    fig = plt.figure(1, figsize=(6, 5))
+    fig = plt.figure(1, figsize=(9, 5))
     ax = fig.add_subplot()
-    ax.set_position([0.1, 0.1, 0.8, 0.8])
+    ax.set_position([0.075, 0.1, 0.8, 0.8])
 
     vmin = min(min(aux) for aux in random_field)
     vmax = max(max(aux) for aux in random_field)
@@ -143,10 +143,15 @@ def plot3D_viewer(coordinates: list, random_field: list, title: str = "Random Fi
             idx = np.where(y == c)
             # img.append(ax.imshow(random_field[i][idx].reshape(
                 # (len(np.unique(x)), len(np.unique(z)))), vmin=vmin, vmax=vmax, cmap="viridis"))
-            img.append(ax.scatter(x[idx], z[idx], c=random_field[i][idx], s=50, marker="s", vmin=vmin, vmax=vmax, cmap="viridis"))
+            img.append(ax.scatter(x[idx], z[idx], c=random_field[i][idx], s=75, marker="s", vmin=vmin, vmax=vmax, cmap="viridis"))
         plts.append(tuple(img))
 
     ax.set_title(title)
+    cax = ax.inset_axes([1.02, 0.05, 0.05, .9])
+    norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
+    cbar = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap="viridis"), ax=ax, cax=cax)
+    cbar.set_label("Values")
+
     ax.set_xlabel('x coordinate')
     ax.set_ylabel('z coordinate')
     ax.grid()

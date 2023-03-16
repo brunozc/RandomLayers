@@ -7,9 +7,6 @@ from RandomLayers.random_fields import RandomFields
 import RandomLayers.vectors_operation as vectors_operation
 
 
-# tolerance to find distances
-TOL = 1e-12
-
 
 class Mesh:
     def __init__(self) -> None:
@@ -125,11 +122,12 @@ class LayersMesh:
             The nodes of the mesh
         """
 
+        # find which polygon the node is in
         for n in nodes:
             aux = False
             # find which polygon the node is in
             for idx, poly in enumerate(self.polygons):
-                if poly.find_simplex(n) >= 0:
+                if poly.find_simplex(n, tol=1e-6) >= 0:
                     self.polygons_index.append(idx)
                     aux = True
                     break
