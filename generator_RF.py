@@ -11,7 +11,7 @@ from RandomLayers.utils import slice
 
 
 def generate_data(x_max, y_max, z_max, nb_max_layers, min_layer_thickness,
-                  planes_dict, soils_dict, output_folder, nb_realisations, min_value=1e-2):
+                  planes_dict, soils_dict, output_folder, nb_realisations, min_value=1):
 
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
@@ -173,7 +173,7 @@ if __name__ == '__main__':
              "max_aniso": [10, 5, 10, 5, 10],
              "max_angle": [np.pi/6, np.pi/6, np.pi/6, np.pi/6, np.pi/6],
              "soil_properties": [3, 2, 1.5, 4, 2.5],
-             "soil_var": [0.5, 0.5, 0.5, 0.5, 0.5],
+             "soil_var": [0.1, 0.1, 0.1, 0.1, 0.1],
             }
 
     x_max = 100
