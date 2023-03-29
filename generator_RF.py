@@ -128,8 +128,8 @@ def generate_data(x_max, y_max, z_max, nb_max_layers, min_layer_thickness,
             fig, ax = plt.subplots(1,1, figsize=(6, 4))
             ax.set_position([0.1, 0.1, 0.7, 0.8])
             im = ax.imshow(sliced_rf[::-1].reshape((resample_points_x, resample_points_z)),
-                           vmin=1., vmax=4., cmap="viridis", extent=[0, x_max, 0, z_max], aspect="auto")
-            cax = fig.add_axes([0.85, 0.1, 0.035, 0.80])
+                           vmin=1., vmax=4., cmap="viridis", extent=[0, x_max, 0, z_max])#, aspect="auto")
+            cax = fig.add_axes([0.85, 0.45, 0.02, 0.1])
             cbar = fig.colorbar(im, cax=cax, fraction=0.046, pad=0.04)
             cbar.set_label("value")
             plt.savefig(os.path.join(output_folder, f"slice_{str(n).zfill(3)}.png"))
@@ -173,7 +173,7 @@ if __name__ == '__main__':
              "max_aniso": [10, 5, 10, 5, 10],
              "max_angle": [np.pi/6, np.pi/6, np.pi/6, np.pi/6, np.pi/6],
              "soil_properties": [3, 2, 1.5, 4, 2.5],
-             "soil_var": [0.1, 0.1, 0.1, 0.1, 0.1],
+             "soil_var": [0.3, 0.2, 0.15, 0.4, 0.25],
             }
 
     x_max = 100
@@ -184,7 +184,7 @@ if __name__ == '__main__':
     min_layer_thickness = 0.1
     output_folder = "./output"
     generate_data(x_max, y_max, z_max, nb_max_layer, min_layer_thickness,
-                  planes, soils, output_folder, 10)
+                  planes, soils, output_folder, 1000)
 
     split_data(output_folder, os.path.join(output_folder, "train"), os.path.join(output_folder, "./validation"),
                train_size=0.8)
