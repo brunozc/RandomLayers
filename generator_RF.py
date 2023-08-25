@@ -1,12 +1,11 @@
 import os
-import shutil
 import numpy as np
 
 # RandomLayers package
 from RandomLayers.random_fields import RandomFields
 from RandomLayers.methods import ModelName
 from RandomLayers.mesh import LayersMesh
-from RandomLayers.utils import slice
+from RandomLayers.utils import slice, split_data
 
 
 
@@ -127,7 +126,7 @@ def generate_data(x_max, y_max, z_max, nb_max_layers, min_layer_thickness,
             import matplotlib.pylab as plt
             fig, ax = plt.subplots(1,1, figsize=(6, 4))
             ax.set_position([0.1, 0.1, 0.7, 0.8])
-            im = ax.imshow(sliced_rf[::-1].reshape((resample_points_x, resample_points_z)),
+            im = ax.imshow(sliced_rf.reshape((resample_points_x, resample_points_z)),
                            vmin=1., vmax=4., cmap="viridis", extent=[0, x_max, 0, z_max])#, aspect="auto")
             cax = fig.add_axes([0.85, 0.45, 0.02, 0.1])
             cbar = fig.colorbar(im, cax=cax, fraction=0.046, pad=0.04)
@@ -137,31 +136,6 @@ def generate_data(x_max, y_max, z_max, nb_max_layers, min_layer_thickness,
         except:
             print(f"Error in {n}")
             continue
-
-
-def split_data(data_path, train_folder, validation_folder, train_size=0.8, shuffle=True):
-    """Split data into train and validation set.
-    """
-
-    if not os.path.isdir(train_folder):
-        os.makedirs(train_folder)
-
-    if not os.path.isdir(validation_folder):
-        os.makedirs(validation_folder)
-
-    files = os.listdir(data_path)
-    files = [f for f in files if f.endswith(".txt")]
-
-    nb_files = len(files)
-    nb_train = int(nb_files * train_size)
-    indexes_train = np.random.choice(range(nb_files), nb_train, replace=False)
-    indexes_validation = np.array([i for i in range(nb_files) if i not in indexes_train])
-
-    for i in indexes_train:
-        shutil.copy(os.path.join(data_path, files[i]), os.path.join(train_folder, files[i]))
-
-    for i in indexes_validation:
-        shutil.copy(os.path.join(data_path, files[i]), os.path.join(validation_folder, files[i]))
 
 
 if __name__ == '__main__':
@@ -184,7 +158,7 @@ if __name__ == '__main__':
     min_layer_thickness = 0.1
     output_folder = "./output"
     generate_data(x_max, y_max, z_max, nb_max_layer, min_layer_thickness,
-                  planes, soils, output_folder, 1000)
+                  planes, soils, output_folder, 10)
 
     split_data(output_folder, os.path.join(output_folder, "train"), os.path.join(output_folder, "./validation"),
                train_size=0.8)

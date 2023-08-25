@@ -1,4 +1,5 @@
 import os
+import shutil
 import numpy as np
 import matplotlib.pylab as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -200,4 +201,40 @@ def slice(coordinates: list, random_field: list, axis: int, coord_slice: float):
         new_coordinates = np.append(new_coordinates, np.array(aux).T, axis=0)
         slice_data.extend(random_field[i][idx])
 
-    return new_coordinates, np.array(slice_data)
+    # Combine coordinates and values into pairs
+    combined = list(zip(new_coordinates, slice_data))
+
+    # Sort based on x and y coordinates
+    sorted_combined = sorted(combined, key=lambda item: (item[0][0], item[0][1]))
+
+    # Extract sorted coordinates and values
+    sorted_coordinates = [item[0] for item in sorted_combined]
+    sorted_values = [item[1] for item in sorted_combined]
+
+    return sorted_coordinates, np.array(sorted_values)
+
+
+def split_data(data_path, train_folder, validation_folder, train_size=0.8, shuffle=True):
+    """
+    Split data into train and validation set.
+    """
+
+    if not os.path.isdir(train_folder):
+        os.makedirs(train_folder)
+
+    if not os.path.isdir(validation_folder):
+        os.makedirs(validation_folder)
+
+    files = os.listdir(data_path)
+    files = [f for f in files if f.endswith(".txt")]
+
+    nb_files = len(files)
+    nb_train = int(nb_files * train_size)
+    indexes_train = np.random.choice(range(nb_files), nb_train, replace=False)
+    indexes_validation = np.array([i for i in range(nb_files) if i not in indexes_train])
+
+    for i in indexes_train:
+        shutil.copy(os.path.join(data_path, files[i]), os.path.join(train_folder, files[i]))
+
+    for i in indexes_validation:
+        shutil.copy(os.path.join(data_path, files[i]), os.path.join(validation_folder, files[i]))
